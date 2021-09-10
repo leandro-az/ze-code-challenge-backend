@@ -106,3 +106,6 @@ dist
 
 # IDE - VSCode
 .vscode/*
+
+# DATA MONGO
+data/

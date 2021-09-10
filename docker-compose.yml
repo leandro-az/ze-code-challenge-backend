@@ -1,0 +1,21 @@
+version: '3'
+
+services:
+  redis:
+    image: redis
+    command: redis-server --requirepass ZeDeliveryRedis@2021!
+    ports:
+      - "6379:6379"
+  mongo:
+    image: mongo
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: mongoUser
+      MONGO_INITDB_ROOT_PASSWORD: ZeDeliveryMongo@2021!
+    ports:
+      - "27017:27017"
+    volumes:
+      - ./data/MongoDB:/data/db 
+  server:
+    build: .
+    ports:
+      - "3000:3000"       
