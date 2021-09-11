@@ -1,5 +1,6 @@
 
 import {
+  IsOptional,
   IsString,
   ValidateNested
 } from 'class-validator';
@@ -7,10 +8,10 @@ import { Type } from 'class-transformer';
 import {MultiPolygonDTO} from './multipolygon.dto';
 import {PointDTO} from './point.dto';
 
-export class RequestBodyCreatePartnertDTO {
+export class PartnertDTO {
 
-    @IsString()
-    id!: string;
+    @IsOptional()
+    id?: string|number;
 
     @IsString()
     tradingName!: string;

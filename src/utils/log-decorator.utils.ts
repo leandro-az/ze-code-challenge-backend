@@ -25,7 +25,7 @@ export namespace LogDecoratorUtils {
         return propertyDesciptor;
       };
     }
-    export function LogAsyncMethod(logParams = true) {
+    export function LogAsyncMethod(logParams = false) {
       return (target: object, propertyName: string, propertyDesciptor: PropertyDescriptor): PropertyDescriptor => {
         const method = propertyDesciptor.value;
         propertyDesciptor.value = async function (...args: any[]) {

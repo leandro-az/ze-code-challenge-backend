@@ -6,17 +6,17 @@ export namespace LoggerUtils {
       logLevel: LogLevelEnum,
       logMessage: string, logErrorStack?: Error): void {
       let logStructure: any;
-      const lodDateTime = moment(new Date()).format('YYYY-MM-DD HH:mm:ss');
+      const logDateTime = moment(new Date()).format('YYYY-MM-DD HH:mm:ss');
 
       if (logLevel === LogLevelEnum.INFO) {
         logStructure = {
-          DATE: lodDateTime,
+          DATE: logDateTime,
           LEVEL: logLevel,
           MESSAGE: logMessage
         };
       } else {
         logStructure = {
-          'DATE': lodDateTime,
+          'DATE': logDateTime,
           'LEVEL': logLevel,
           'MESSAGE': logMessage,
           'STACK TRACE': logErrorStack === undefined ? '' : logErrorStack.stack
