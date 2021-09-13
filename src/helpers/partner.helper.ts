@@ -1,12 +1,12 @@
-import {Service} from 'typedi';
 import {Partner} from '../models/partner.model';
 import {PartnertDTO} from '../dtos/partner.dto';
 import {ResponseSearchPartnerByIdDTO} from '../dtos/response-body-search-partner-by-id.dto';
 import {ResponseSearchPartnersByAdressDTO} from '../dtos/response-body-search-partners-by-adress.dto';
+import {ResponseCreateManyPartnersDTO} from '../dtos/response-body-create-many-partners.dto'
 import { LogDecoratorUtils } from '../utils/log-decorator.utils';
 import {HttpStatusEnum} from '../enums/http-status.enum';
+import { v1 as uuidv1 } from 'uuid';
 
-@Service()
 export class PartnerHelper{
 
     @LogDecoratorUtils.LogMethod()
@@ -15,7 +15,7 @@ export class PartnerHelper{
       addressPoint:partnerDTO.address,
       coverageAreaMultiPol: partnerDTO.coverageArea,
       documentStr: partnerDTO.document,
-      id: partnerDTO.id? `${partnerDTO.id}` :'',
+      idExternalStr: partnerDTO.id? `${partnerDTO.id}`:uuidv1(),
       ownerNameStr: partnerDTO.ownerName,
       tradingNameStr: partnerDTO.tradingName
     }
@@ -26,7 +26,7 @@ export class PartnerHelper{
         address:partner.addressPoint,
         coverageArea:partner.coverageAreaMultiPol,
         document:partner.documentStr,
-        id: partner.id,
+        id: partner.idExternalStr,
         ownerName: partner.ownerNameStr,
         tradingName: partner.tradingNameStr
       }
@@ -94,4 +94,25 @@ export class PartnerHelper{
         statusCode:HttpStatusEnum.NOT_FOUND
       }
     }
+
+    @LogDecoratorUtils.LogMethod()
+    generateResponseBodyToCreatePartners(partnersSuc: Partner[],partnersFail: Partner[]): ResponseCreateManyPartnersDTO{
+      const listPartnertSucDTO: PartnertDTO[]=[];
+      const listPartnertFailDTO: PartnertDTO[]=[];
+      for(const partner of partnersSuc){
+        listPartnertSucDTO.push(this.convertPartnerToPartnerDTO(partner))
+      }
+      for(const partner of partnersFail){
+        listPartnertFailDTO.push(this.convertPartnerToPartnerDTO(partner))
+      }
+      return {
+        message: 'List of Partners  created Successfully!',
+        pdvsSuccess: listPartnertSucDTO,
+        totalRecordsSuccess: listPartnertSucDTO.length,
+        pdvsErros:listPartnertFailDTO,
+        totalRecordsErros:listPartnertFailDTO.length,
+        statusCode:HttpStatusEnum.ACCEPTED
+      }
+    }
+
 }

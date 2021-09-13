@@ -1,15 +1,20 @@
+
 import express from 'express'
 import { json, raw, text, urlencoded } from 'body-parser';
 import {RouterMapper }from './routes/routerMap'
 import cors from 'cors';
-import Container from 'typedi';
-let instance: RouterMapper | undefined;
 import { LoggerUtils} from './utils/logger.utils';
 import {LogLevelEnum} from './enums/log-level.enums';
+import {Application} from 'express';
+import * as swaggerUi from 'swagger-ui-express';
+import * as yml from 'yamljs';
+import * as path from 'path';
 
 
 class App {
-    public express: express.Application = express()
+    private API_BASE_URL='/api/v1'
+    private instance: RouterMapper =new RouterMapper();
+    public express: Application = express()
     public async initialize() {
       try {
         this.express.use(json());
@@ -28,18 +33,17 @@ class App {
         res.header('Access-Control-Allow-Origin', '*');
         res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
         next();
-      })
-      if (!instance) {
-        instance = Container.get(RouterMapper);
-      }
-      this.express.use(instance.AppRouter)
+      });
+      const swaggerDocument = yml.load('./src/swagger.yaml');
+      this.express.use('/docs',swaggerUi.serve,swaggerUi.setup(swaggerDocument));
+      this.express.use(this.API_BASE_URL,this.instance.AppRouter)
       this.express.all('*', async (_req, res) => {
         res.status(404).json('Route not found')
       })
     }
 }
 
-export default async function appFactory() {
+export default async function appFactory(): Promise<Application> {
   const app = new App()
   await app.initialize()
   return app.express

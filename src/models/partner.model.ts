@@ -1,5 +1,5 @@
 
-import {Entity, ObjectIdColumn, Column} from 'typeorm';
+import {Entity, ObjectIdColumn, Column,ObjectID} from 'typeorm';
 import {Point} from './point.model';
 import {MultiPolygon} from './multipolygon.model'
 
@@ -7,7 +7,10 @@ import {MultiPolygon} from './multipolygon.model'
 export class Partner {
 
     @ObjectIdColumn()
-    id!: string;
+    id?: ObjectID;
+
+    @Column()
+    idExternalStr!: string;
 
     @Column()
     tradingNameStr!: string;

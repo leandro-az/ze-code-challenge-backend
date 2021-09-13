@@ -14,7 +14,7 @@ export class PointDTO {
 
       @IsArray()
       @IsValidPoint()
-      coordinates!: Array<number>;
+      coordinates!: number[];
 
 
 }

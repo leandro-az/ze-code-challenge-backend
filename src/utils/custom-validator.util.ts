@@ -8,20 +8,22 @@ import {
 } from 'class-validator';
 import { LoggerUtils } from './logger.utils';
 import { LogLevelEnum } from '../enums/log-level.enums';
+import {geojsonType} from '@turf/turf'
+// import {} from 'geojson-validation'
 
 
-function verifyLatitudesandLongitudes(array: number[]): boolean{
-  if(array.length!==2 ){
-    return false
-  }
-  if((array[0]<(-90))|| (array[0]>(90))){
-    return false
-  }
-  if((array[1]<(-180))|| (array[1]>(80))){
-    return false
-  }
-  return true
-}
+// function verifyLatitudesAndLongitudes(array: number[]): boolean{
+//   if(array.length!==2 ){
+//     return false
+//   }
+//   if((array[0]<(-90))|| (array[0]>(90))){
+//     return false
+//   }
+//   if((array[1]<(-180))|| (array[1]>(180))){
+//     return false
+//   }
+//   return true
+// }
 
 export function IsValidPoint(validationOptions?: ValidationOptions) {
   return Validate(PointValidator, validationOptions);
@@ -31,7 +33,18 @@ export function IsValidPoint(validationOptions?: ValidationOptions) {
 export class PointValidator implements ValidatorConstraintInterface {
 
   validate(arrayPoints: number[]): boolean {
-    return verifyLatitudesandLongitudes(arrayPoints)
+    try {
+      const obj={
+        type: 'Point',
+        coordinates: arrayPoints
+      }
+      geojsonType(obj,'Point','Error')
+      // point(arrayPoints);
+      return true
+    } catch (error: any) {
+      LoggerUtils.log(LogLevelEnum.ERROR, 'Error validating point',error);
+      return false
+    }
   }
 
   defaultMessage(validationArguments?: ValidationArguments): string {
@@ -48,29 +61,16 @@ export function IsValidMultiPolygon(validationOptions?: ValidationOptions) {
 @ValidatorConstraint({ name: 'IsValidMultiPolygon', async: false })
 export class MultiPolygonValidator implements ValidatorConstraintInterface {
 
-  validate(arrayOfPolygons: Array<Array<Array<Array<number>>>>): boolean {
+  validate(arrayOfPolygons: number[][][][]): boolean {
     try {
-      if(arrayOfPolygons.length<2) {
-        throw new Error('Only One Polygon not MultiPolygon')
+      const obj={
+        type: 'MultiPolygon',
+        coordinates: arrayOfPolygons
       }
-      for(const polygonDefinitios of arrayOfPolygons){
-        if(polygonDefinitios.length<1){
-          throw new Error('One Specific Polygon dont have definitions')
-        }
-        for(const polygonCoordPoints of polygonDefinitios){
-          if(polygonCoordPoints.length<3){
-            throw new Error('One Specific Polygon dont have enough')
-          }
-          for(const point of polygonCoordPoints){
-            if(!verifyLatitudesandLongitudes(point)) {
-              throw new Error('One Specific point of one polygon is not a LatitudesandLongitudes type')
-            }
-          }
-        }
-      }
+      geojsonType(obj,'MultiPolygon','Error')
       return true
     } catch (error: any) {
-      LoggerUtils.log(LogLevelEnum.ERROR, 'Error validating coord',error);
+      LoggerUtils.log(LogLevelEnum.ERROR, 'Error validating MultiPolygon',error);
       return false
     }
 

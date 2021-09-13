@@ -7,7 +7,7 @@ export class Point {
       type!: string;
 
       @Column()
-      coordinates!: Array<number>;
+      coordinates!: number[];
 
 
 }

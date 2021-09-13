@@ -13,6 +13,6 @@ export class MultiPolygonDTO{
     type!: string;
     @IsArray()
     @IsValidMultiPolygon()
-    coordinates!: Array<Array<Array<Array<number>>>>;
+    coordinates!: number[][][][];
 }
 
