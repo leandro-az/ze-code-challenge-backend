@@ -15,6 +15,7 @@ paths:
   /pdv: 
     post:
       summary: "Insert new PDV"
+      tags: ['PDV']
       description: "This route have the responsability do insert new PDV"
       requestBody:
           content: 
@@ -37,22 +38,121 @@ paths:
               schema: 
                   message:
                     type: string                
-                  $ref: "#/components/schemas/partnerResult"         
+                  $ref: "#/components/schemas/partnerResultFail" 
+
+  /pdv/{id}:
+    get:
+      summary: "Get PDV by id"
+      tags: ['PDV']
+      description: "This route have the responsability do recovery PDV by id"
+      parameters:
+        - in: path
+          name: id
+          description: "Id of PDV"
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: "Partner Recovered Successfully!" 
+          content: 
+            aplication/json:
+              schema: 
+                  message:
+                    type: string                
+                  $ref: "#/components/schemas/partnerResult"
+        "404":
+          description: "Partner Recovered Fail!" 
+          content: 
+            aplication/json:
+              schema: 
+                  message:
+                    type: string                
+                  $ref: "#/components/schemas/partnerResultFail"  
+
+
+  /pdv/closer: 
+    post:
+      summary: "Find PDV closer"
+      tags: ['PDV']
+      description: "This route have the responsability do find the PDV closer of a coord"
+      requestBody:
+          content: 
+            aplication/json:
+              schema: 
+                $ref: "#/components/schemas/targetRequest"
+      responses:
+        "200":
+          description: "Partner Recovered Successfully!" 
+          content: 
+            aplication/json:
+              schema: 
+                  message:
+                    type: string                
+                  $ref: "#/components/schemas/partnerResult"
+        "404":
+          description: "Partner Recovered Fail!" 
+          content: 
+            aplication/json:
+              schema: 
+                  message:
+                    type: string                
+                  $ref: "#/components/schemas/partnerResultFail" 
+  /pdv/fill: 
+    post:
+      summary: "Fill database with PDVS"
+      tags: ['PDV']
+      description: "This route have the responsability do fill database with PDVS examples"
+      responses:
+        "200":
+          description: "Processo Iniciado!" 
+          content: 
+            aplication/json:
+              schema: 
+                   $ref: "#/components/schemas/simpleMessage"
+        "500":
+          description: "Partner Recovered Fail!" 
+          content: 
+            aplication/json:
+              schema: 
+                  $ref: "#/components/schemas/simpleMessage"                                                   
 
 
 
                 
 components:
   schemas:
+    simpleMessage:
+      type: "object"
+      properties:
+        message:
+          type: string
+
+    targetRequest:
+      type: "object"
+      properties:
+        targetAddress:
+           $ref: "#/components/schemas/Point"
+
+
     partnerRequest:
       type: "object"
       properties:
         pdv: 
            $ref: "#/components/schemas/partner"           
             
+    
+    partnerResultFail:
+      type: "object"
+      properties:
+        message: 
+          type: string
+        pdv: null
+        statusCode:
+          type: integer
+      
 
     partnerResult:
-      nullable: true
       type: "object"
       properties:
         pdv:
