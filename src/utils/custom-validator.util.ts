@@ -38,7 +38,7 @@ export class PointValidator implements ValidatorConstraintInterface {
         type: 'Point',
         coordinates: arrayPoints
       }
-      geojsonType(obj,'Point','Error')
+      geojsonType(obj,'Point','IsValidPoint')
       // point(arrayPoints);
       return true
     } catch (error: any) {
@@ -67,7 +67,7 @@ export class MultiPolygonValidator implements ValidatorConstraintInterface {
         type: 'MultiPolygon',
         coordinates: arrayOfPolygons
       }
-      geojsonType(obj,'MultiPolygon','Error')
+      geojsonType(obj,'MultiPolygon','IsValidMultiPolygon')
       return true
     } catch (error: any) {
       LoggerUtils.log(LogLevelEnum.ERROR, 'Error validating MultiPolygon',error);

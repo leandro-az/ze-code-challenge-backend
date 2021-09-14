@@ -5,6 +5,9 @@ import {LogLevelEnum} from './enums/log-level.enums';
 import {Application} from 'express';
 import * as dotenv from 'dotenv';
 
+/**
+   * @description  Class that init the server
+   */
 
 async function init() {
   try {

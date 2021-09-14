@@ -8,9 +8,11 @@ import {LogLevelEnum} from './enums/log-level.enums';
 import {Application} from 'express';
 import * as swaggerUi from 'swagger-ui-express';
 import * as yml from 'yamljs';
-import * as path from 'path';
 
-
+/**
+   * @description  Class that configure all we need to append to express aplication
+   * like routes,swagger,json,cors....
+   */
 class App {
     private API_BASE_URL='/api/v1'
     private instance: RouterMapper =new RouterMapper();

@@ -10,7 +10,7 @@ function tryJSONStringify(data: any) {
 }
 
 export namespace LogDecoratorUtils {
-    export function LogMethod(logParams = true) {
+    export function LogMethod(logParams = false) {
       return (target: object, propertyName: string, propertyDesciptor: PropertyDescriptor): PropertyDescriptor => {
         const method = propertyDesciptor.value;
         propertyDesciptor.value = function (...args: any[]) {

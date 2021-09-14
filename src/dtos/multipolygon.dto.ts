@@ -11,6 +11,7 @@ export class MultiPolygonDTO{
     @IsString()
     @Equals('MultiPolygon')
     type!: string;
+
     @IsArray()
     @IsValidMultiPolygon()
     coordinates!: number[][][][];

@@ -183,11 +183,9 @@ components:
         coordinates: 
           type: array
           items:
-            type: array
-            items:
-              type: integer
-            minItems: 2
-            maxItems: 2  
+            type: integer
+          minItems: 2
+          maxItems: 2  
         type: 
           type: 
               string
