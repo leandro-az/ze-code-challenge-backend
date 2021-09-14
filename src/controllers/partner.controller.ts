@@ -10,9 +10,18 @@ import {LogLevelEnum} from '../enums/log-level.enums';
 import {RequestValidatorUtils} from '../utils/request-validator.utils';
 import { NextFunction, Request, Response } from 'express';
 import pdvs from '../../files/pdvs.json';
+import * as redis from 'redis';
+const { promisify } = require('util');
+const redisUrl = `redis://${process.env.REDIS_HOST}:${process.env.REDIS_PORT}`;
+const redisClient = redis.createClient(redisUrl);
+const getAsync = promisify(redisClient.get).bind(redisClient);
+
+// client.set('colors',JSON.stringify({red: 'rojo'}))
+// const value = await client.get('colors')
 export class PartnerController{
   /**
    * @description Recovery Partner by Id
+   * Try first recovery from redis , if not found try in mongodb
    * Recive the partner id from request.
    */
   @LogDecoratorUtils.LogAsyncMethod()
@@ -20,7 +29,14 @@ export class PartnerController{
     try {
       const partnerService: PartnerService= new PartnerService();
       const partnerId: string = req.params.id as string;
-      const result= await partnerService.findPartnerById(partnerId);
+      const value = await getAsync(`idExternalStr-${partnerId}`);
+      let result;
+      if(value){
+        result = JSON.parse(value);
+      }else{
+        result= await partnerService.findPartnerById(partnerId);
+        redisClient.setex(`idExternalStr-${partnerId}`,3600,JSON.stringify(result));
+      }
       return res
         .status(result.statusCode)
         .json(result)
@@ -81,7 +97,14 @@ export class PartnerController{
       const partnerService: PartnerService= new PartnerService();
       const requestValidatorUtils:  RequestValidatorUtils=  new RequestValidatorUtils()
       const requestBodySearchPartnertDTO: RequestBodySearchPartnertDTO = requestValidatorUtils.validateDTORequestBody(RequestBodySearchPartnertDTO,req.body)
-      const result= await partnerService.findPartnerByLocalization(requestBodySearchPartnertDTO.targetAddress);
+      const value = await getAsync(`targetAddress-${requestBodySearchPartnertDTO.targetAddress.coordinates}`);
+      let result;
+      if(value){
+        result = JSON.parse(value);
+      }else{
+        result= await partnerService.findPartnerByLocalization(requestBodySearchPartnertDTO.targetAddress);
+        redisClient.setex(`targetAddress-${requestBodySearchPartnertDTO.targetAddress.coordinates}`,3600,JSON.stringify(result));
+      }
       return res
         .status(result.statusCode)
         .json(result)

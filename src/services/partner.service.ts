@@ -65,7 +65,7 @@ export class PartnerService{
         const partnerResul= this.getCloserAdress(pointDTO.coordinates,partners);
         return partnerHelper.generateResponseBodyToRecoveryPartnerByIdSuccessfully(partnerResul)
       }else{
-        return partnerHelper.generateResponseBodyToResquestPartnerByIdFail()
+        return partnerHelper.generateResponseBodyToResquestPartnerByIdFail('No Partner Found!')
       }
 
     } catch (error: any) {
