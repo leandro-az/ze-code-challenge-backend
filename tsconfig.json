@@ -1,0 +1,35 @@
+{
+  "compilerOptions": {
+    "lib": [
+      "esnext",
+      "es2018",
+      "es2018.promise",
+      "esnext.asynciterable",
+      "esnext.bigint",
+      "esnext.array"
+    ],
+    "allowUnusedLabels": false,
+    "noUnusedLocals": false,
+    "noUnusedParameters": true,
+    "target": "es6",
+    "module": "commonjs",
+    "moduleResolution": "node",
+    "outDir": "./dist",
+    "baseUrl": "./src/",
+    "noLib": false,
+    "strict": true,
+    "allowSyntheticDefaultImports": true,
+    "newLine": "LF",
+    "pretty": true,
+    "allowJs": true,
+    "checkJs": true,
+    "sourceMap": true,
+    "removeComments": true,
+    "esModuleInterop": true,
+    "emitDecoratorMetadata": true,
+    "experimentalDecorators": true,
+    "resolveJsonModule": true
+  },
+  "include": ["src/**/*", "server.ts", "src/tests"],
+  "exclude": ["node_modules", "dist"]
+}

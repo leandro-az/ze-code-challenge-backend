@@ -1,0 +1,193 @@
+openapi: 3.0.0
+info:
+  title: ZE-BACKEND-CHALLENGE 
+  version: 1.0.0
+  description: "Documentation of ze-backend-challenge"
+  license:
+    name: MIT
+    url: 'https://spdx.org/licenses/MIT.html'
+  contact:
+    name: Leandro Almeida
+    email: leandro_almeida@id.uff.br
+servers:
+  - url: 'http://localhost:3000/api/v1'
+paths:
+  /pdv: 
+    post:
+      summary: "Insert new PDV"
+      tags: ['PDV']
+      description: "This route have the responsability do insert new PDV"
+      requestBody:
+          content: 
+            text/plain:
+              schema: 
+                $ref: "#/components/schemas/partnerRequest"
+      responses:
+        "201":
+          description: "Partner Created Successfully!" 
+          content: 
+            aplication/json:
+              schema: 
+                  message:
+                    type: string                
+                  $ref: "#/components/schemas/partnerResult"
+        "409":
+          description: "Partner Created Fail!" 
+          content: 
+            aplication/json:
+              schema: 
+                  message:
+                    type: string                
+                  $ref: "#/components/schemas/partnerResultFail" 
+
+  /pdv/{id}:
+    get:
+      summary: "Get PDV by id"
+      tags: ['PDV']
+      description: "This route have the responsability do recovery PDV by id"
+      parameters:
+        - in: path
+          name: id
+          description: "Id of PDV"
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: "Partner Recovered Successfully!" 
+          content: 
+            aplication/json:
+              schema: 
+                  message:
+                    type: string                
+                  $ref: "#/components/schemas/partnerResult"
+        "404":
+          description: "Partner Recovered Fail!" 
+          content: 
+            aplication/json:
+              schema: 
+                  message:
+                    type: string                
+                  $ref: "#/components/schemas/partnerResultFail"  
+
+  /pdv/closer: 
+    post:
+      summary: "Find PDV closer"
+      tags: ['PDV']
+      description: "This route have the responsability do find the PDV closer of a coord"
+      requestBody:
+          content: 
+            text/plain:
+              schema: 
+                $ref: "#/components/schemas/targetRequest"
+      responses:
+        "200":
+          description: "Partner Recovered Successfully!" 
+          content: 
+            aplication/json:
+              schema: 
+                  message:
+                    type: string                
+                  $ref: "#/components/schemas/partnerResult"
+        "404":
+          description: "Partner Recovered Fail!" 
+          content: 
+            aplication/json:
+              schema: 
+                  message:
+                    type: string                
+                  $ref: "#/components/schemas/partnerResultFail" 
+                                        
+
+
+            
+components:
+  schemas:
+    simpleMessage:
+      type: "object"
+      properties:
+        message:
+          type: string
+
+    targetRequest:
+      type: "object"
+      properties:
+        targetAddress:
+           $ref: "#/components/schemas/Point"
+
+
+    partnerRequest:
+      type: "object"
+      properties:
+        pdv: 
+           $ref: "#/components/schemas/partner"           
+            
+    
+    partnerResultFail:
+      type: "object"
+      properties:
+        message: 
+          type: string
+        pdv: null
+        statusCode:
+          type: integer
+      
+
+    partnerResult:
+      type: "object"
+      properties:
+        pdv:
+          $ref: "#/components/schemas/partner" 
+        message:
+          type: string
+                  
+
+    partner: 
+      type:  "object"
+      properties:
+        coverageArea:  
+          $ref: "#/components/schemas/MultiPolygon"
+        id: 
+          type: string
+        tradingName: 
+           type:  string
+        ownerName:  
+           type: string
+        document:  
+           type: string
+        address: 
+          $ref: "#/components/schemas/Point"
+
+    Point:
+      type: "object"
+      properties:
+        coordinates: 
+          type: array
+          items:
+            type: integer
+          minItems: 2
+          maxItems: 2  
+        type: 
+          type: 
+              string
+
+    MultiPolygon:
+      type: "object"
+      properties:
+        coordinates: 
+          type: array 
+          items:
+            type: array
+            items:
+              type: array
+              items:
+                type: array
+                items:
+                  type: integer
+                minItems: 2 
+              minItems: 3
+            minItems: 1      
+          minItems: 1       
+        type: 
+          type: 
+            string
