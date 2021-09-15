@@ -1,3 +1,4 @@
+import 'reflect-metadata';
 import { expect } from 'chai';
 import { describe, it,} from 'mocha';
 import {PartnerService} from '../src/services/partner.service';
@@ -9,7 +10,19 @@ import {RequestBodySearchPartnertDTO} from '../src/dtos/request-body-search-part
 import * as dotenv from 'dotenv';
 import {PartnerRepository} from '../src/repositories/partner.repository';
 import {Partner} from '../src/models/partner.model';
+import {PartnerHelper} from '../src/helpers/partner.helper';
+import {PointDTO} from '../src/dtos/point.dto';
 dotenv.config();
+const pointFailCustomTest={
+    targetAddress: {
+      coordinates: [
+        180,
+        180,
+        180
+      ],
+      type: 'Point'
+    }
+  }
 const pointFailTest={
     targetAddress: {
       coordinates: [
@@ -28,13 +41,83 @@ const pointTest={
       type: 'Point'
     }
   }
-const pdvTest={
+const pdvTest:RequestCreateOnePartnerDTO={
     pdv:
     {
       id: '999',
       tradingName: 'TESTE DEFAULT PDV ',
       ownerName: 'AUTOMATIC TESTE PDV',
       document: '99999.999.410/0001-19',
+      coverageArea: {
+        type: 'MultiPolygon',
+        coordinates: [
+          [
+            [
+              [
+                107,
+                7
+              ],
+              [
+                108,
+                7
+              ],
+              [
+                108,
+                8
+              ],
+              [
+                107,
+                8
+              ],
+              [
+                107,
+                7
+              ]
+            ]
+          ],
+          [
+            [
+              [
+                100,
+                0
+              ],
+              [
+                101,
+                0
+              ],
+              [
+                101,
+                1
+              ],
+              [
+                100,
+                1
+              ],
+              [
+                100,
+                0
+              ]
+            ]
+          ]
+        ]
+      },
+      address: {
+        type: 'Point',
+        coordinates: [
+          -43.97662,
+          -19.837042
+        ]
+      }
+    }
+}
+
+const pdvTestRepository:RequestCreateOnePartnerDTO={
+    pdv:
+    {
+      id: '888',
+      tradingName: 'TESTE DEFAULT PDV  REPOSITORY',
+      ownerName: 'AUTOMATIC TESTE PDV REPOSITORY',
+      document: '88888.888.410/0001-18',
       coverageArea: {
         type: 'MultiPolygon',
         coordinates: [
@@ -145,6 +228,122 @@ describe('RequestValidatorUtils', ( )=> {
         });
     });
 
+    describe('RequestCreateOnePartnerDTO - FORCE ERROR', () => {
+        it('The pdv item must validate a error',  async (): Promise<void> => {
+            try {
+                requestValidatorUtils.validateDTORequestBody(PointDTO,pointFailCustomTest)   
+                expect.fail("Test validate mus thow errros.")    
+            } catch (error) {
+                expect(1).to.eq(1) 
+            }            
+        });
+    });
+
+});
+
+describe('PartnerHelper', ( )=> {
+    const partnerHelper = new PartnerHelper()  
+    describe('RequestCreateOnePartnerDTO', () => {
+        it('Build response - Try insert Duplicated value', () => {
+                       const duplicatedValue = partnerHelper.generateResponseBodyToResquestPartnerDuplicatedFail();
+                       expect(duplicatedValue.statusCode).to.eq(409)
+        });
+        it('Build response - Insert fail', () => {
+            const inserrt = partnerHelper.generateResponseBodyToCreatePartnerFail();
+            expect(inserrt.statusCode).to.eq(409)
+        });
+
+        it('Build response - Insert Successfully', () => {
+            const inserrt = partnerHelper.generateResponseBodyToRecoveryPartnersSuccessfully([]);
+            expect(inserrt.statusCode).to.eq(202)
+        });
+
+        it('Build response - Recovery Partners Fail', () => {
+            const duplicatedValue = partnerHelper.generateResponseBodyToRecoveryPartnersFail([]);
+            expect(duplicatedValue.statusCode).to.eq(404)
+        });
+
+        it('Build response - Recovery Partners Fail', () => {
+            const duplicatedValue = partnerHelper.generateResponseBodyToCreatePartners([],[]);
+            expect(duplicatedValue.statusCode).to.eq(202)
+        });
+
+        
+    });
+
+});
+
+
+describe('PartnerRepository', ( )=> {
+    const partnerRepository = new PartnerRepository();
+    const partnerHelper: PartnerHelper= new PartnerHelper()
+    describe('insertOne', () => {
+        it('Shoud insert one partner',  async (): Promise<void> => {
+            try {
+                const partnerToInsert= partnerHelper.convertPartnerDtoToPartner(pdvTestRepository.pdv);
+                const result = await  partnerRepository.insertOne(partnerToInsert) 
+                expect(`${result.idExternalStr}`).to.eq(`${pdvTestRepository.pdv.id}`)   
+            } catch (error) {
+                expect.fail("Insert one pdv fail")  
+            }             
+        });
+    }); 
+
+    describe('createIndex', () => {
+        it('Create index on partner',  async (): Promise<void> => {
+            try {
+                const result = await partnerRepository.createIndex()  
+                expect(result).to.eq(true);  
+            } catch (error) {
+                expect.fail("Create Index fail")  
+            }            
+        });
+    });
+    
+    describe('findMany', () => {
+        it('Find many',  async (): Promise<void> => {
+            try {
+                const result:Partner[] = await partnerRepository.findMany()  
+                expect((result.length>0)).to.eq(true);  
+            } catch (error) {
+                expect.fail("Find Many fail")  
+            }            
+        });
+    });  
+
+    describe('findByIdOrDocument', () => {
+        it('Find element by id or document - ITEM MUST EXISTS ',  async (): Promise<void> => {
+            try {
+                const result:Partner[] = await partnerRepository.findByIdOrDocument(`${pdvTestRepository.pdv.id}`,pdvTestRepository.pdv.document)  
+                expect(result.length).to.eq(1);  
+            } catch (error) {
+                expect.fail("Request validate thows exception and failed to validate one pdv item")  
+            }            
+        });
+    });
+
+    describe('findByIdOrDocument', () => {
+        it('Find element by id or document - ITEM MUST NOT EXISTS ',  async (): Promise<void> => {
+            try {
+                const result:Partner[] = await partnerRepository.findByIdOrDocument('MMM','MMM')  
+                expect(result.length).to.eq(0);  
+            } catch (error) {
+                expect.fail("Request validate thows exception and failed to validate one pdv item")  
+            }            
+        });
+    });
+
+    describe('Delete Many', () => {
+        it('Delete  many',  async (): Promise<void> => {
+            try {
+                const result:boolean = await partnerRepository.deleteMany()  
+                expect(result).to.eq(true);  
+            } catch (error) {
+                expect.fail("Delete many fail")  
+            }            
+        });
+    });  
+
 });
 
 describe('PartnerService', ( )=> {
@@ -166,7 +365,7 @@ describe('PartnerService', ( )=> {
                     expect.fail("Teste validate one item fail.")  
                 }      
             } catch (error) {
-                expect.fail("Request validate thows exception and failed to validate one pdv item")  
+                expect.fail("Insert one partner fail")  
             }            
         });
     });
@@ -193,27 +392,27 @@ describe('PartnerService', ( )=> {
             if(result && result.pdv && result.pdv.id ){
                 expect(result.pdv.id).to.eq('999');
             }else{
-                expect.fail("Teste recovery one item fail in compare.")  
+                expect.fail("Teste recovery partner one item fail in compare.")  
             }
             } catch (error) {
-                expect.fail("Teste recovery one throws exception!")  
+                expect.fail("Teste recovery partner one throws exception!")  
             }            
         });
     }); 
 
     describe('insertManyPartners', () => {
-        it('Should insert and return pdv with id 999',  async (): Promise<void> => {
+        it('Should insert a pdv list',  async (): Promise<void> => {
             try {
                 const requestCreateManyPartnersDTO: RequestCreateManyPartnersDTO = requestValidatorUtils.validateDTORequestBody(RequestCreateManyPartnersDTO,pdvs)
             if(requestCreateManyPartnersDTO && requestCreateManyPartnersDTO.pdvs){
-                expect(requestCreateManyPartnersDTO.pdvs.length).to.eq(50);
+                // expect(requestCreateManyPartnersDTO.pdvs.length).to.eq(51);
                 const result = await partnerService.insertManyPartners(requestCreateManyPartnersDTO.pdvs);
                 expect(result).to.eq(true);
             }else{
                 expect.fail("Teste recovery one item fail in compare.")  
             }
             } catch (error) {
-                expect.fail("Request validate thows exception and failed to validate the list of pdvs")  
+                expect.fail("Insert pdv list thowrs excpetion")  
             }             
         });
     });
@@ -225,10 +424,10 @@ describe('PartnerService', ( )=> {
             if(result && result.pdv && result.pdv.id ){
                 expect(result.pdv.id).to.eq('1');
             }else{
-                expect.fail("Teste recovery one item fail in compare.")  
+                expect.fail("Teste recovery partner by id fail in compare.")  
             }
             } catch (error) {
-                expect.fail("Teste recovery one throws exception!")  
+                expect.fail("Teste recovery partner by id  throws exception!")  
             }            
         });
     }); 
@@ -242,13 +441,13 @@ describe('PartnerService', ( )=> {
                     if(result && result.pdv && result.pdv.id ){
                         expect(result.pdv.id).to.eq('3');
                     }else{
-                        expect.fail("Teste recovery closer one item fail in compare.")  
+                        expect.fail("Teste recovery closer  item fail in compare.")  
                     }
                 }else{
-                    expect.fail("Teste validate closer one item fail.")  
+                    expect.fail("Teste validate closer  item fail.")  
                 }      
             } catch (error) {
-                expect.fail("Request validate thows exception and failed to validate targetAdress item")  
+                expect.fail("Teste recovery closer thows exception and failed to validate targetAdress item")  
             }            
         });
     });
@@ -262,13 +461,13 @@ describe('PartnerService', ( )=> {
                     if(result){
                         expect(result.pdv).to.eq(null);
                     }else{
-                        expect.fail("Teste recovery closer one item fail in compare.")  
+                        expect.fail("Teste not recovery closer one item fail in compare.")  
                     }
                 }else{
-                    expect.fail("Teste validate closer one item fail.")  
+                    expect.fail("Teste validate not closer one item fail.")  
                 }      
             } catch (error) {
-                expect.fail("Request validate thows exception and failed to validate targetAdress item")  
+                expect.fail("Test not recovery closer thows exception and failed to validate targetAdress item")  
             }            
         });
     });
@@ -276,50 +475,4 @@ describe('PartnerService', ( )=> {
        
 });
 
-describe('PartnerRepository', ( )=> {
-    const partnerRepository = new PartnerRepository()  
-    describe('createIndex', () => {
-        it('Create index on partner',  async (): Promise<void> => {
-            try {
-                const result = await partnerRepository.createIndex()  
-                expect(result).to.eq(true);  
-            } catch (error) {
-                expect.fail("Request validate thows exception and failed to validate one pdv item")  
-            }            
-        });
-    });
-    
-    describe('findMany', () => {
-        it('Find many',  async (): Promise<void> => {
-            try {
-                const result:Partner[] = await partnerRepository.findMany()  
-                expect((result.length>0)).to.eq(true);  
-            } catch (error) {
-                expect.fail("Request validate thows exception and failed to validate one pdv item")  
-            }            
-        });
-    });  
 
-    describe('findByIdOrDocument', () => {
-        it('Find element by id or document - ITEM MUST EXISTS ',  async (): Promise<void> => {
-            try {
-                const result:Partner[] = await partnerRepository.findByIdOrDocument(pdvTest.pdv.id,pdvTest.pdv.document)  
-                expect(result.length).to.eq(1);  
-            } catch (error) {
-                expect.fail("Request validate thows exception and failed to validate one pdv item")  
-            }            
-        });
-    });
-
-    describe('findByIdOrDocument', () => {
-        it('Find element by id or document - ITEM MUST NOT EXISTS ',  async (): Promise<void> => {
-            try {
-                const result:Partner[] = await partnerRepository.findByIdOrDocument('MMM','MMM')  
-                expect(result.length).to.eq(0);  
-            } catch (error) {
-                expect.fail("Request validate thows exception and failed to validate one pdv item")  
-            }            
-        });
-    });
-
-});

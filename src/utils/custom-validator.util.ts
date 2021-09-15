@@ -39,6 +39,9 @@ export class PointValidator implements ValidatorConstraintInterface {
         coordinates: arrayPoints
       }
       geojsonType(obj,'Point','IsValidPoint')
+      if(arrayPoints.length!==2){
+        throw new Error('Wrong length of array point')
+      }
       // point(arrayPoints);
       return true
     } catch (error: any) {

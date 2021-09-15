@@ -49,10 +49,13 @@ export class PartnerRepository{
   }
 
   @LogDecoratorUtils.LogAsyncMethod()
-  async findByIdExternal(id: string): Promise<Partner>{
+  async findByIdExternal(id: string): Promise<Partner|undefined>{
     const conn = await getconnectionMongo();
     const repository: MongoRepository<Partner> = conn.getMongoRepository(Partner);
-    const result = await repository.findOneOrFail({idExternalStr: id})
+    const query={
+      where:{idExternalStr: id}
+    }
+    const result = await repository.findOne(query)
     return result
   }
   @LogDecoratorUtils.LogAsyncMethod()
@@ -85,6 +88,15 @@ export class PartnerRepository{
     const repository: MongoRepository<Partner> = conn.getMongoRepository(Partner);
     const result = await repository.find(query);
     return result
+  }
+
+  @LogDecoratorUtils.LogAsyncMethod()
+  async deleteMany(query={}): Promise<boolean>{
+    const conn = await getconnectionMongo();
+    const repository: MongoRepository<Partner> = conn.getMongoRepository(Partner);
+    const result = await repository.delete(query);
+    const bool: boolean= (result &&  result.affected&& result.affected>0) ?true:false
+    return bool
   }
 
 }

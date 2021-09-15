@@ -22,6 +22,9 @@ export class PartnerService{
     const partnerHelper: PartnerHelper= new PartnerHelper()
     try {
       const partner= await partnerRepository.findByIdExternal(id);
+      if(!partner){
+        return partnerHelper.generateResponseBodyToResquestPartnerByIdFail()
+      }
       return partnerHelper.generateResponseBodyToRecoveryPartnerByIdSuccessfully(partner)
     } catch (error: any) {
       LoggerUtils.log(LogLevelEnum.ERROR, '... @PartnerService/findPartnerById',error);

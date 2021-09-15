@@ -2,10 +2,7 @@
 import {
   IsString,
   Equals,
-  IsArray,
-  ValidateNested,
-  ArrayMinSize,
-  ArrayMaxSize
+  IsArray
 } from 'class-validator';
 import {IsValidPoint} from '../utils/custom-validator.util';
 
@@ -16,8 +13,6 @@ export class PointDTO {
       type!: string;
 
       @IsArray()
-      @ArrayMinSize(2)
-      @ArrayMaxSize(2)
       @IsValidPoint()
       coordinates!: number[];
 

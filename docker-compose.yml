@@ -1,7 +1,7 @@
 version: '3.8'
 
 services:
-# =========================================== PRODUCTION =============================================
+
   redisserver:
     image: redis
     ports:
@@ -45,7 +45,6 @@ services:
     networks:
       - server-network     
 
-  # ================================================== TESTES ==================================================
   redisserverTest:
     image: redis
     ports:
@@ -61,7 +60,7 @@ services:
       MONGO_INITDB_ROOT_PASSWORD: ZeDeliveryMongo2021Teste
     ports:
       - "27018:27018"
-    command: mongod --quiet --logpath /dev/null 
+    command: mongod --port 27018 --quiet --logpath /dev/null 
     networks:
       - test-network
 
@@ -84,8 +83,7 @@ services:
     networks:
       - test-network 
     # volumes:
-    #   - ./data/logs:/usr/app/logs   
-     
+    #   - ./data/logs:/usr/app/logs    
 
 
 networks: 

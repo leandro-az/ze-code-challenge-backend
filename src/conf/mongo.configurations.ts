@@ -12,9 +12,7 @@ export async function getconnectionMongo(): Promise<Connection>{
     name: `DEFAULT_MONGO_${process.env.BRANCH}`,
     useUnifiedTopology: true,
     entities:[Partner],
-
   };
-
   try {
     const conn=  getConnection(options.name);
     return conn;

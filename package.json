@@ -4,7 +4,7 @@
   "description": "Backend Challenge to Ze-Delivery",
   "main": "server.js",
   "scripts": {
-    "test": "nyc mocha --require ts-node/register ./tests/*.test.ts",
+    "test": "nyc mocha --exit --require ts-node/register ./tests/*.test.ts",
     "lint": "eslint ./src --ext .ts",
     "lint:fix": "eslint ./src --ext .ts --fix",
     "start": "pm2 start ./dist/server.js",
