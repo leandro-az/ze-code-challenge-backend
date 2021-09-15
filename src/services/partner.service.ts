@@ -52,7 +52,8 @@ export class PartnerService{
   }
 
   /**
-   * @description Search a partner by Localization.
+   * @description Search a partners that intersec the target adress.
+   * With list of intersections calculate de closer partner by distance of the target
    * Then prepare and transform de Partner to a DTO and send in response body
    * @param pointDTO Used to find partner closer of one adress.
    */
@@ -63,7 +64,7 @@ export class PartnerService{
     const partnerHelper: PartnerHelper= new PartnerHelper()
     try {
 
-      const partners= await partnerRepository.findManyIncludingCoord(pointDTO.coordinates);
+      const partners= await partnerRepository.findManyGeoIntersec(pointDTO.coordinates);
       if(partners && partners.length){
         const partnerResul= this.getCloserAdress(pointDTO.coordinates,partners);
         return partnerHelper.generateResponseBodyToRecoveryPartnerByIdSuccessfully(partnerResul)

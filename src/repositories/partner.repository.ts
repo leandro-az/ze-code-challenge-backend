@@ -66,7 +66,7 @@ export class PartnerRepository{
     return result
   }
   @LogDecoratorUtils.LogAsyncMethod()
-  async findManyIncludingCoord(coord: number[]): Promise<Partner[]>{
+  async findManyGeoIntersec(coord: number[]): Promise<Partner[]>{
     const conn = await getconnectionMongo();
     const query={
       where:{
