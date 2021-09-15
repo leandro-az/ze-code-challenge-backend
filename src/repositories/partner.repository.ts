@@ -12,12 +12,24 @@ export class PartnerRepository{
     // this.createIndex()
   }
 
+  /**
+   * @description  Create index to help in find
+   * Note: I would create a index 2dsphere to coverageAreaMultiPol but some pdvs coverege ares
+   * that interpolating each oder generating that creates an anomaly in the polygon shap
+   */
+  async createIndex(): Promise<boolean>{
+    try {
+      const conn = await getconnectionMongo();
+      const repository: MongoRepository<Partner> = conn.getMongoRepository(Partner);
+      await repository.createCollectionIndex({documentStr:1},{unique: true})
+      await repository.createCollectionIndex({idExternalStr:1},{unique: true})
+      return true
+    } catch (error) {
+      return false
+    }
 
-  async createIndex(){
-    const conn = await getconnectionMongo();
-    const repository: MongoRepository<Partner> = conn.getMongoRepository(Partner);
-    await repository.createCollectionIndex({documentStr:1},{unique: true})
-    await repository.createCollectionIndex({idExternalStr:1},{unique: true})
+    // await repository.createCollectionIndex({addressPoint:'2dsphere'})
+    // await repository.createCollectionIndex({coverageAreaMultiPol:'2dsphere'})
   }
 
   @LogDecoratorUtils.LogAsyncMethod()

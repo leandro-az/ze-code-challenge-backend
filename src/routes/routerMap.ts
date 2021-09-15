@@ -15,6 +15,6 @@ export  class RouterMapper {
       this.AppRouter.get('/pdv/:id', this.partnerController.findPartnerById);
       this.AppRouter.post('/pdv', this.partnerController.insertOnePartner);
       this.AppRouter.post('/pdv/closer', this.partnerController.findPartnerByLocalization);
-      this.AppRouter.post('/pdv/fill', this.partnerController.insertManyPartners);
+      // this.AppRouter.post('/pdv/fill', this.partnerController.insertManyPartners);
     }
 }

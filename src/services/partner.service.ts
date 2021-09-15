@@ -8,7 +8,7 @@ import { LogDecoratorUtils } from '../utils/log-decorator.utils';
 import { LoggerUtils} from '../utils/logger.utils';
 import {LogLevelEnum} from '../enums/log-level.enums';
 import { Partner } from '../models/partner.model';
-import {distance} from '@turf/turf'
+import {distance} from '@turf/turf';
 
 export class PartnerService{
   /**
@@ -89,7 +89,7 @@ export class PartnerService{
     try {
       const partnerFound = await partnerRepository.findByIdOrDocument(`${partnerDTO.id}`,partnerDTO.document)
       if(partnerFound && partnerFound.length){
-        return partnerHelper.generateResponseBodyToResquestPartnerByIdFail('Partner with id or document alredy Exists!')
+        return partnerHelper.generateResponseBodyToResquestPartnerDuplicatedFail()
       }
       const partnerToInsert= partnerHelper.convertPartnerDtoToPartner(partnerDTO);
       await partnerRepository.insertOne(partnerToInsert);
@@ -106,12 +106,21 @@ export class PartnerService{
    * @param partnersDTO The list of partners we want to insert.
    */
   @LogDecoratorUtils.LogAsyncMethod()
-  async insertManyPartners(partnersDTO: PartnertDTO[]): Promise<void>{
-    LoggerUtils.log(LogLevelEnum.INFO, '... @PartnerService/insertManyPartners/init......');
-    for (const partnerDTO of  partnersDTO) {
-      await this.insertOnePartner(partnerDTO)
+  async insertManyPartners(partnersDTO: PartnertDTO[]): Promise<boolean>{
+    try {
+      LoggerUtils.log(LogLevelEnum.INFO, '... @PartnerService/insertManyPartners/init......');
+      for (const partnerDTO of  partnersDTO) {
+        await this.insertOnePartner(partnerDTO)
+      }
+      const partnerRepository: PartnerRepository= new PartnerRepository()
+      await partnerRepository.createIndex();
+      LoggerUtils.log(LogLevelEnum.INFO, '... @PartnerService/insertManyPartners/finished......');
+      return true
+    } catch (error: any) {
+      LoggerUtils.log(LogLevelEnum.ERROR, '... @PartnerService/insertManyPartners',error);
+      return false
     }
-    LoggerUtils.log(LogLevelEnum.INFO, '... @PartnerService/insertManyPartners/finished......');
+
 
   }
 }

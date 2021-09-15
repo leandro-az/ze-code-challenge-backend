@@ -1,6 +1,4 @@
 import {createConnection, Connection,getConnection,ConnectionOptions} from 'typeorm';
-import { LoggerUtils} from '../utils/logger.utils';
-import {LogLevelEnum} from '../enums/log-level.enums';
 import {Partner} from '../models/partner.model';
 
 export async function getconnectionMongo(): Promise<Connection>{
@@ -11,16 +9,17 @@ export async function getconnectionMongo(): Promise<Connection>{
     database:  process.env.MONGO_DATABASE,
     username: process.env.MONGO_USERNAME,
     password: process.env.MONGO_PASSWORD,
-    name: 'DEFAULT_MONGO',
+    name: `DEFAULT_MONGO_${process.env.BRANCH}`,
     useUnifiedTopology: true,
-    entities:[Partner]
+    entities:[Partner],
+
   };
 
   try {
     const conn=  getConnection(options.name);
     return conn;
   } catch (error: any) {
-    LoggerUtils.log(LogLevelEnum.ERROR, '... @getconnectionMongo...',error);
+    // LoggerUtils.log(LogLevelEnum.ERROR, '... @getconnectionMongo...',error);
     return (await createConnection(options));
   }
 }

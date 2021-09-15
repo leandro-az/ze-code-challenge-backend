@@ -41,11 +41,20 @@ export class PartnerHelper{
     }
 
     @LogDecoratorUtils.LogMethod()
-    generateResponseBodyToResquestPartnerByIdFail(msg='Partner Recovered Fail!'): ResponseSearchPartnerByIdDTO{
+    generateResponseBodyToResquestPartnerByIdFail(msg='Partner not found!'): ResponseSearchPartnerByIdDTO{
       return {
         message: msg,
         pdv: null,
         statusCode:HttpStatusEnum.NOT_FOUND
+      }
+    }
+
+    @LogDecoratorUtils.LogMethod()
+    generateResponseBodyToResquestPartnerDuplicatedFail(msg='Partner with id or document already Exists!'): ResponseSearchPartnerByIdDTO{
+      return {
+        message: msg,
+        pdv: null,
+        statusCode:HttpStatusEnum.CONFLICT
       }
     }
 

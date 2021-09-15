@@ -16,14 +16,18 @@ const redisUrl = `redis://${process.env.REDIS_HOST}:${process.env.REDIS_PORT}`;
 const redisClient = redis.createClient(redisUrl);
 const getAsync = promisify(redisClient.get).bind(redisClient);
 
-// client.set('colors',JSON.stringify({red: 'rojo'}))
-// const value = await client.get('colors')
 export class PartnerController{
   /**
    * @description Recovery Partner by Id
    * Try first recovery from redis , if not found try in mongodb
    * Recive the partner id from request.
    */
+  constructor(){
+    this.insertManyPartners().then(()=>
+      LoggerUtils.log(LogLevelEnum.INFO, '... @PartnerController/constructor')
+    )
+  }
+
   @LogDecoratorUtils.LogAsyncMethod()
   async findPartnerById(req: Request, res: Response, next: NextFunction): Promise<any>{
     try {
@@ -53,9 +57,11 @@ export class PartnerController{
   @LogDecoratorUtils.LogAsyncMethod()
   async insertOnePartner(req: Request, res: Response, next: NextFunction): Promise<any>{
     try {
+      // @TODO  swagger não esta enviando application/json, verificar
+      const body = (req.body &&req.body.pdv) ? req.body : JSON.parse(req.body);
       const partnerService: PartnerService= new PartnerService();
       const requestValidatorUtils:  RequestValidatorUtils=  new RequestValidatorUtils()
-      const requestCreatePartnersDTO: RequestCreateOnePartnerDTO = requestValidatorUtils.validateDTORequestBody(RequestCreateOnePartnerDTO,req.body)
+      const requestCreatePartnersDTO: RequestCreateOnePartnerDTO = requestValidatorUtils.validateDTORequestBody(RequestCreateOnePartnerDTO,body)
       const result= await partnerService.insertOnePartner(requestCreatePartnersDTO.pdv);
       return res
         .status(result.statusCode)
@@ -71,18 +77,14 @@ export class PartnerController{
    */
 
   @LogDecoratorUtils.LogAsyncMethod()
-  async insertManyPartners(_req: Request, res: Response, next: NextFunction): Promise<any>{
+  async insertManyPartners(): Promise<any>{
     try {
       const partnerService: PartnerService= new PartnerService();
       const requestValidatorUtils:  RequestValidatorUtils=  new RequestValidatorUtils()
       const requestCreateManyPartnersDTO: RequestCreateManyPartnersDTO = requestValidatorUtils.validateDTORequestBody(RequestCreateManyPartnersDTO,pdvs)
       partnerService.insertManyPartners(requestCreateManyPartnersDTO.pdvs);
-      return res
-        .status(200)
-        .json({message:'Processo Iniciado!'})
     } catch (error: any) {
       LoggerUtils.log(LogLevelEnum.ERROR, '... @PartnerController/insertManyPartners',error);
-      next(error)
     }
   }
 
@@ -94,9 +96,11 @@ export class PartnerController{
   @LogDecoratorUtils.LogAsyncMethod()
   async findPartnerByLocalization(req: Request, res: Response, next: NextFunction): Promise<any>{
     try {
+      // @TODO  swagger não esta enviando application/json, verificar
+      const body =  (req.body &&req.body.targetAddress) ? req.body : JSON.parse(req.body);
       const partnerService: PartnerService= new PartnerService();
       const requestValidatorUtils:  RequestValidatorUtils=  new RequestValidatorUtils()
-      const requestBodySearchPartnertDTO: RequestBodySearchPartnertDTO = requestValidatorUtils.validateDTORequestBody(RequestBodySearchPartnertDTO,req.body)
+      const requestBodySearchPartnertDTO: RequestBodySearchPartnertDTO = requestValidatorUtils.validateDTORequestBody(RequestBodySearchPartnertDTO,body)
       const value = await getAsync(`targetAddress-${requestBodySearchPartnertDTO.targetAddress.coordinates}`);
       let result;
       if(value){
