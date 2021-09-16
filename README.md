@@ -57,7 +57,7 @@ Ao executar o comando anterior o resultado esperado é esse:
 
 ![Servidor em execução](files/server-runnig-screen.png)
 
-
+***Obs: Ao iniciar a aplicação eu preencho a base com os dados de exemplo disponíveis [aqui](https://github.com/ZXVentures/ze-code-challenges/blob/master/files/pdvs.json).**
 ### 💨 Executar Testes:
 
 ***Vá para o terminal, acesse a raiz do projeto (baixado/clonado)**
@@ -72,7 +72,7 @@ Ao executar o comando anterior o resultado esperado é esse:
 
 ### ▶️ Utilizar:
 
-- Você pode acessar a api de documentação do swagger atravez do link : http://localhost:3000/docs/ e utilizar os serviços por lá 😉.
+- Você pode acessar a api de documentação do swagger atravez do link : http://localhost:3000/docs/ e utilizar os serviços por lá.
     - Tela do Swegger:
 
 ![Tela Swegger](files/swagger-screen.png)
